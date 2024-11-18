@@ -39,7 +39,7 @@ The User Authentication Microservice can be interaced with the following endpoin
 | `/login`    |  POST  | Authenticate a user.  |
 
 ### How to Request and Receive data
-This microservice communicates via HTTP requests with [JSON](https://en.wikipedia.org/wiki/JSON) serialized messages. Refer to `\frontend-demo\` for an example.
+This microservice communicates via HTTP requests with [JSON](https://en.wikipedia.org/wiki/JSON) serialized messages.
 
 #### Requesting Data
 Data can be requested from the microservice by using the `POST` HTTP request type, with the relevant endpoint route to send the input JSON object to elicit a response.
