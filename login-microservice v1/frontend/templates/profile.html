@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+</head>
+<body>
+    <h2>User Profile</h2>
+    <button id="getProfileButton">Get Profile</button>
+
+    <p id="profileResponse"></p>
+
+    <script>
+        document.getElementById('getProfileButton').addEventListener('click', function() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                document.getElementById('profileResponse').innerText = 'You must log in first.';
+                return;
+            }
+
+            fetch('http://127.0.0.1:5000/api/auth/profile', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.user) {
+                    document.getElementById('profileResponse').innerText = 'Username: ' + data.user.username + ', ID: ' + data.user.id;
+                } else {
+                    document.getElementById('profileResponse').innerText = 'Error fetching profile: ' + data.error;
+                }
+            })
+            .catch(error => {
+                document.getElementById('profileResponse').innerText = 'An error occurred: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>

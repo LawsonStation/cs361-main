@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration and Login</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <h1>User Registration and Login</h1>
+    
+    <!-- Registration Form -->
+    <form id="registerForm">
+        <h2>Register</h2>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Register</button>
+    </form>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+        <h2>Login</h2>
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" name="loginUsername" required>
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" name="loginPassword" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <h2>Protected Content</h2>
+    <button id="getProtectedData">Get Protected Data</button>
+    <p id="protectedMessage"></p>
+
+    <script>
+        // Register User
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+
+            fetch('http://127.0.0.1:5000/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            }).then(response => response.json())
+              .then(data => alert(data.msg));
+        });
+
+        // Login User
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let username = document.getElementById('loginUsername').value;
+            let password = document.getElementById('loginPassword').value;
+
+            fetch('http://127.0.0.1:5000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.access_token) {
+                      localStorage.setItem('access_token', data.access_token);
+                      alert(data.msg);
+                  } else {
+                      alert(data.msg);
+                  }
+              });
+        });
+
+        // Fetch Protected Content
+        document.getElementById('getProtectedData').addEventListener('click', function() {
+            let token = localStorage.getItem('access_token');
+            if (token) {
+                fetch('http://127.0.0.1:5000/api/protected', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(response => response.json())
+                  .then(data => document.getElementById('protectedMessage').innerText = `Logged in as: ${data.logged_in_as}`);
+            } else {
+                alert('Please log in first');
+            }
+        });
+    </script>
+</body>
+</html>

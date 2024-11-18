@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Microservice</title>
+</head>
+<body>
+
+<h2>Register</h2>
+<form id="register-form">
+    <label>Username:</label><br>
+    <input type="text" id="register-username" required><br><br>
+    <label>Email:</label><br>
+    <input type="email" id="register-email" required><br><br>
+    <label>Password:</label><br>
+    <input type="password" id="register-password" required><br><br>
+    <button type="submit">Register</button>
+</form>
+
+<h2>Login</h2>
+<form id="login-form">
+    <label>Email:</label><br>
+    <input type="email" id="login-email" required><br><br>
+    <label>Password:</label><br>
+    <input type="password" id="login-password" required><br><br>
+    <button type="submit">Login</button>
+</form>
+
+<h2>User Profile</h2>
+<button id="view-profile" style="display:none;">View Profile</button>
+<p id="profile-info"></p>
+
+<script>
+const apiUrl = 'http://127.0.0.1:5000/api/auth';
+
+// Register User
+document.getElementById('register-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('register-username').value;
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    
+    fetch(`${apiUrl}/register`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, email, password})
+    })
+    .then(response => response.json())
+    .then(data => alert(data.message || data.error))
+    .catch(error => alert('Error: ' + error));
+});
+
+// Login User
+document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    fetch(`${apiUrl}/login`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.token) {
+            localStorage.setItem('token', data.token);
+            document.getElementById('view-profile').style.display = 'block';
+            alert('Login successful!');
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => alert('Error: ' + error));
+});
+
+// View Profile
+document.getElementById('view-profile').addEventListener('click', function() {
+    const token = localStorage.getItem('token');
+
+    fetch(`${apiUrl}/profile`, {
+        method: 'GET',
+        headers: {'Authorization': `Bearer ${token}`}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.user) {
+            document.getElementById('profile-info').textContent = `ID: ${data.user.id}, Username: ${data.user.username}`;
+        } else {
+            document.getElementById('profile-info').textContent = data.error;
+        }
+    })
+    .catch(error => alert('Error: ' + error));
+});
+</script>
+
+</body>
+</html>
