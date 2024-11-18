@@ -114,7 +114,6 @@ if (response.ok) {
 {
   "message": "Error creating user"
 }
-or 
 {
   "message":"Error hashing password"
 }
