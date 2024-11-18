@@ -112,7 +112,11 @@ if (response.ok) {
 #### Request Response - Server Error (500):
 ```json
 {
-  "message": "Error creating user" or "Error hashing password"
+  "message": "Error creating user"
+}
+or 
+{
+  "message":"Error hashing password"
 }
 ```
 
