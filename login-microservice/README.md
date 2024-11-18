@@ -3,7 +3,7 @@
 ---
 
 **Author**: hokevi@oregonstate.edu  
-**Project**: CS 361 - Software Engineering I
+**Project**: CS 361 - Software Engineering I  
 **Assignment**: Microservice A
 
 ## Overview
@@ -30,8 +30,6 @@ This microservice provides a user authentication system to manage user registrat
 4.  Start the microservice locally using `node server.js`, and the program will run on the designated PORT (default: port 5000).
 5.  In your main program, incoporate the appropriate API calls to send/receive messages from the microservice (see [Using the Microservice](#using-the-microservice)).
 
-TODO: fix this link
-
 ## Using the Microservice
 The User Authentication Microservice can be interaced with the following endpoints:
 
@@ -41,7 +39,7 @@ The User Authentication Microservice can be interaced with the following endpoin
 | `/login`    |  POST  | Authenticate a user.  |
 
 ### How to Request and Receive data
-This microservice communicates via HTTP requests with [JSON](https://en.wikipedia.org/wiki/JSON) serialized messages. Refer to `frontend-demo\` for an example.
+This microservice communicates via HTTP requests with [JSON](https://en.wikipedia.org/wiki/JSON) serialized messages. Refer to `\frontend-demo\` for an example.
 
 #### Requesting Data
 Data can be requested from the microservice by using the `POST` HTTP request type, with the relevant endpoint route to send the input JSON object to elicit a response.
@@ -79,9 +77,9 @@ Example call:
 // Add code here to send response.
 const responseBody = await response.json();
 if (response.ok) {
-    // Do something.
+    // Do something (with the response message).
 } 
-// Add other code here
+// Add other code here.
 ```
 
 ### Request and Response Format Reference
@@ -102,14 +100,14 @@ if (response.ok) {
 ```
 
 
-#### Request Response - Client Error (400):
+##### Request Response - Client Error (400):
 ```json
 {
   "message": "Error creating user"
 }
 ```
 
-#### Request Response - Server Error (500):
+##### Request Response - Server Error (500):
 ```json
 {
   "message": "Error creating user"
@@ -128,7 +126,7 @@ if (response.ok) {
 }
 ```
 
-#### Request Response - Success (201):
+##### Request Response - Success (201):
 ```json
 {
   "message": "Login successful",
@@ -136,14 +134,14 @@ if (response.ok) {
 }
 ```
 
-#### Request Response - Client Error (400)
+##### Request Response - Client Error (400)
 ```json
 {
   "message": "Username and password are required"
 }
 ```
 
-#### Request Response - Client Error (401)
+##### Request Response - Client Error (401)
 ```json
 {
   "message": "Invalid credentials"
@@ -151,14 +149,14 @@ if (response.ok) {
 ```
 
 
-#### Request Response - Not Found (404)
+##### Request Response - Not Found (404)
 ```json
 {
   "message": "User not found"
 }
 ```
 
-#### Request Response - Server Error (500)
+##### Request Response - Server Error (500)
 ```json
 {
   "message": "Error comparing passwords"
