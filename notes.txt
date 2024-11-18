@@ -1,3 +1,0 @@
-Python/Flask instructions and terminal commands
-
-venv\Scripts\activate to activate
