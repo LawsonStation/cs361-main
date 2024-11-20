@@ -113,7 +113,7 @@ if (response.ok) {
   "message": "Error creating user"
 }
 {
-  "message":"Error hashing password"
+  "message": "Error hashing password"
 }
 ```
 
