@@ -44,6 +44,8 @@
                 <p>No photo available</p>
             {% endif %}
 
+            <p><strong>Page Views:</strong> {{ page_count or 'Unable to fetch count' }}</p>
+
             <a href="{{ url_for('browse') }}">Back to Items List</a>
         </div>
         <br>

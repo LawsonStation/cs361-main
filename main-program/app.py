@@ -4,6 +4,7 @@ import config
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 import base64
+import requests
 # from app\models import db, Item, User
 # from models import Junkyard, item_test
 
@@ -205,31 +206,59 @@ def account():
     
 @app.route('/item/<int:item_id>')
 def item_detail(item_id):
+        # Call the microservice to increment page view count for the item
+    microservice_url = f'http://127.0.0.1:5001/view/{item_id}'
+    
+    # POST request to increment page view
+    try:
+        response = requests.post(microservice_url)
+        response.raise_for_status()  # Will raise an HTTPError if the HTTP request failed
+    except requests.exceptions.RequestException as e:
+        flash(f"Error incrementing page view: {e}", "error")
+
+    # Fetch item witht the specified ID details from database 
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Fetch the item with the specified ID
     cursor.execute('SELECT * FROM items WHERE id = ?', (item_id,))
     item = cursor.fetchone()  # This will now be a Row object
-
     conn.close()
+
+    # Fetch the page view count from the microservice (GET request)
+    try:
+        view_count_response = requests.get(f'http://127.0.0.1:5001/view/{item_id}')
+        view_count_response.raise_for_status()
+        page_count = view_count_response.json().get("count", 0)
+    except requests.exceptions.RequestException as e:
+        page_count = None  # In case of error, page count will be None
+        flash(f"Error retrieving page view count: {e}", "error")
+
 
     # Check if the item was found
     if item is None:
         return "Item not found", 404  # Return 404 if item not found
 
-    return render_template('item_detail.html', item=item)  # Pass the Row object to the template
+    return render_template('item_detail.html', item=item, page_count=page_count)  # Pass the Row object to the template
 
 @app.route('/delete_listing/<int:item_id>', methods=['POST'])
 def delete_listing(item_id):
+    # Delete the item with the specified ID from the local database
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Delete the item with the specified ID
     cursor.execute("DELETE FROM items WHERE id = ?", (item_id,))
     conn.commit()
     conn.close()
     
+    # Call the microservice to delete the corresponding page view record
+    try:
+        microservice_url = f'http://127.0.0.1:5001/delete/{item_id}'  # URL for the delete endpoint in the microservice
+        response = requests.post(microservice_url)
+        response.raise_for_status()  # Raise an error if the HTTP request fails
+        
+        flash("Listing deleted successfully.", "info")
+    except requests.exceptions.RequestException as e:
+        flash(f"Error deleting listing from microservice: {e}", "error")
+
+
     flash("Listing deleted successfully.", "info")
     return redirect(url_for('browse'))
 
@@ -316,4 +345,4 @@ def dashboard():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
