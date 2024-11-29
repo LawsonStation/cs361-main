@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>Home Page</h1>
+    </header>
+
+    <main>
+        <p>
+        <a href="{{ url_for('browse') }}">Browse</a>
+        </p>
+        
+        <p>
+        <a href="{{ url_for('create_listing') }}">Create Listing</a>
+        </p>
+        <!-- <form method="POST">
+            <p>
+                <button type="button" id="createListingButton">Create Listing</button>
+            </p>
+            <p>
+                <button type="button" id="browseButton">Browse</button>
+            </p>
+        </form> -->
+    </main>
+{% endblock %}
+

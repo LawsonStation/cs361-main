@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Junkyard 🗑️{% endblock %}</title>
+        <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/styles.css') }}">
+    </head>
+    <body>
+        {% include 'partials/navbar.html' %} {# Include the navigation bar #}
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>
+</body>

@@ -1,0 +1,15 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}My Account{% endblock %}
+
+{% block content %}
+
+<header><h1>My Account</h1></header>
+
+<main>
+    <body>
+        <p>Greetings, {{ current_user.username }}!</p>
+    </body>
+</main>
+
+{% endblock %}

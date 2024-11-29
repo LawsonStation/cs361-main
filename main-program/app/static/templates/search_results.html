@@ -1,0 +1,49 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<style> 
+    table, th, td { 
+    border:1px solid black; 
+    } 
+    </style>
+<!-- <!DOCTYPE html>
+<html> -->
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results for "{{ query }}"</h1>
+
+    {% if data %}
+    <table style="width:100%">
+        <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Zip Code</th>
+            <th>Details</th>
+        </tr>
+        {% for item in data %}
+        <tr>
+            <td>{{ item['title'] }}</td>
+            <td>${{ item['price'] }}</td>
+            <td>{{ item['description'] }}</td>
+            <td>{{ item['city'] }}</td>
+            <td>{{ item['state'] }}</td>
+            <td>{{ item['zip_code'] }}</td>
+            <td><a href="{{ url_for('item_detail', item_id=item['id']) }}">View
+                    Details</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No results found for "{{ query }}".</p>
+    {% endif %}
+
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,298 @@
+/*  ===== MOBILE styles (reside at the top and are inherited by all devices) ===== */
+/*  ===== See tablet, desktop, and print @media queries at the bottom. */
+
+
+/*   ----- Imports  -----  */
+/* @import 'node_modules/modern-normalize/modern-normalize.css';  npm install modern-normalize  Resets elements for browser consistency.  https://www.npmjs.com/package/modern-normalize */
+/* @import "component1.css";   Component-specific stylesheets, if any.   */
+/* @import url(//fonts.googleapis.com/css?family=Font+Name); Add fonts from a hosted services like Google Fonts.   */
+
+
+/*   ----- Variables  -----  */
+:root {
+    /* --custom-color-name:;
+    --custom-embellishment-name:; */
+    --teal: #008080;
+    --beige: #F5F5DC;
+}
+
+/*  ----- Viewport ----- elements inherited by all remaining elements ----- */
+body {
+    /* Can alternatively define in html {}. */
+    background-color: var(--beige);
+    /* background-image:; */
+    /* color:; */
+    /* font-family:; /* Define with at least one font name and its related generic family name.*/
+    /* margin:;
+    padding:;
+    max-width:; */
+}
+
+/*  ----- Page layout blocks -----  */
+header {}
+
+main {}
+
+section {}
+
+article {}
+
+/* #topic1 {}
+    #topic2 {} */
+div {}
+
+aside {}
+
+footer {}
+
+/* ----- Anchors ----- Text links */
+a {}
+
+a:link {}
+
+a:hover {}
+
+a:active {}
+
+a:visited {}
+
+/*  ----- Navigation ----- Override text links for navigation only.  */
+nav {
+    float: right;
+}
+
+nav a {}
+
+nav a:hover {}
+
+/*  -----  Typography  ----- */
+p {}
+
+br {}
+
+ol,
+ul,
+dl {}
+
+li {}
+
+dt {}
+
+dd {}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {}
+
+h1 {}
+
+h2 {}
+
+h3 {}
+
+h4 {}
+
+h5 {}
+
+h6 {}
+
+abbr {}
+
+acronym {}
+
+address {}
+
+blockquote {}
+
+q {}
+
+cite {}
+
+em {}
+
+hr {}
+
+mark {}
+
+s {}
+
+span {}
+
+strong {}
+
+sub {}
+
+sup {}
+
+time {}
+
+/*  ----- Coding or instructional typography ----- */
+pre {}
+
+code {}
+
+kbd {}
+
+samp {}
+
+var {}
+
+del {}
+
+ins {}
+
+/*  ----- Table ----- */
+table {}
+
+caption {}
+
+thead {}
+
+tbody {}
+
+tfoot {}
+
+tr {}
+
+tr:nth-child(even) {}
+
+th {}
+
+td {}
+
+td:nth-child(1) {}
+
+colgroup {}
+
+data {}
+
+datalist {}
+
+
+/*  ----- Form ----- */
+form {
+    /* display: flex; */
+    /* Use flexbox for layout */
+    /* flex-direction: column; /* Stack children vertically */
+    /* max-width: 300px; */
+    /* Set a maximum width for the form */
+    /* width: 100%; */
+
+    /* margin: auto; /* Center the form on the page */
+    /* padding: 20px; /* Add padding inside the form */
+    /* border: 1px solid #ccc; /* Light border around the form */
+    /* border-radius: 8px; /* Rounded corners */
+    /* background-color: #f9f9f9; /* Light background color */
+}
+
+.form-group {
+    /* display: flex; /* Use Flexbox for alignment */
+    /* align-items: center; /* Center align items vertically */
+    /* margin-bottom: 15px; /* Space between form groups */
+}
+
+
+fieldset {}
+
+legend {}
+
+label {
+    
+}
+
+button {
+    /* width: 100%;
+    padding: 10px; */
+}
+
+input {
+}
+
+select {}
+
+optgroup {}
+
+option {}
+
+textarea {}
+
+output {}
+
+meter {}
+
+progress {}
+
+
+/* ----- Media ----- */
+figure {}
+
+figcaption {}
+
+figure img {}
+
+svg {}
+
+picture {}
+
+source {}
+
+iframe {}
+
+video {}
+
+audio {}
+
+embed {}
+
+object {}
+
+/*  ----- Classes for alignment, positioning, widths, grids, embellishments, and animation -----  */
+.gallery {}
+
+.floatright {}
+
+.floatleft {}
+
+.center-middle {}
+
+.ten {}
+
+.twenty {}
+
+.thirty {}
+
+.forty {}
+
+.fifty {}
+
+.sixty {}
+
+.seventy {}
+
+.eighty {}
+
+.radius {}
+
+.circle {}
+
+.boxshadow {}
+
+.tshadow {}
+
+.gradient {}
+
+.shape {}
+
+@keyframes App-logo {}
+
+/*   ===== TABLET  media query overrides mobile styles ===== */
+@media all and (min-width: 600px) {}
+
+/*   ===== DESKTOP  media query overrides mobile and tablet styles ===== */
+@media all and (min-width: 1080px) {}
+
+/*   ===== PRINT  media query overrides previous styles =====  */
+@media print {}

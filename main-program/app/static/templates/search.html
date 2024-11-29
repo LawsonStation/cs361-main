@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Browse{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Search</h1>
+</header>
+
+<main>
+    <form method="GET" action="{{ url_for('search') }}">
+        <input type="text" name="query" placeholder="Search items..." required>
+        <button type="submit">Search</button>
+    </form>
+
+</main>
+
+<footer>
+
+</footer>
+</body>
+
+{% endblock %}
