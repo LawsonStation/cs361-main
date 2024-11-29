@@ -1,3 +1,4 @@
 # Ignore virtual environment
 env/
 __pycache__/
+_old/v1/node_modules
