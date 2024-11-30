@@ -29,10 +29,11 @@ class Item(db.Model):
     city = db.Column(db.String(100), nullable=False)
     state = db.Column(db.String(100), nullable=False)
     zip_code = db.Column(db.String(10), nullable=False)
-    photo = db.Column(db.Blob), nullable=True)
+    # photo = db.Column(db.Blob), nullable=True)
 
     def __repr__(self):
-        return f"ItemTest('{self.title}', '{self.price}', '{self.description}', '{self.city}', '{self.state}', '{self.zip_code}', '{self.photo}')"
+        return f"ItemTest('{self.title}', '{self.price}', '{self.description}', '{self.city}', '{self.state}', '{self.zip_code}')"
+        # return f"ItemTest('{self.title}', '{self.price}', '{self.description}', '{self.city}', '{self.state}', '{self.zip_code}', '{self.photo}')"
 
 
 # Model for User (Flask-Login) - methods for managing user authentication state.
