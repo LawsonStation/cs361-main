@@ -204,24 +204,18 @@ def account():
 #     data = cursor.fetchone()
 #     return render_template('item_detail.html', item=item)
     
-@app.route('/item/<int:item_id>')
+@app.route('/item/<int:item_id>', methods=['GET', 'POST'])
 def item_detail(item_id):
-        # Call the microservice to increment page view count for the item
-    microservice_url = f'http://127.0.0.1:5001/view/{item_id}'
-    
-    # POST request to increment page view
-    try:
-        response = requests.post(microservice_url)
-        response.raise_for_status()  # Will raise an HTTPError if the HTTP request failed
-    except requests.exceptions.RequestException as e:
-        flash(f"Error incrementing page view: {e}", "error")
-
-    # Fetch item witht the specified ID details from database 
+    # Fetch item details from database
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM items WHERE id = ?', (item_id,))
     item = cursor.fetchone()  # This will now be a Row object
     conn.close()
+
+    # Check if the item was found
+    if item is None:
+        return "Item not found", 404  # Return 404 if item not found
 
     # Fetch the page view count from the microservice (GET request)
     try:
@@ -232,12 +226,30 @@ def item_detail(item_id):
         page_count = None  # In case of error, page count will be None
         flash(f"Error retrieving page view count: {e}", "error")
 
+    # Initialize map_image_base64 with a default value
+    map_image_base64 = None
 
-    # Check if the item was found
-    if item is None:
-        return "Item not found", 404  # Return 404 if item not found
+    # Send zip code to the microservice to generate a map (raw image data) using GET with query parameters
+    try:
+        # Use GET request with query parameters (zipCode)
+        map_response = requests.get(
+            f'http://127.0.0.1:5002/map-image?zipCode={item["zip_code"]}',
+            stream=True  # Use stream=True to handle large image data efficiently
+        )
+        map_response.raise_for_status()
+        if map_response.status_code == 200:
+            map_image_data = map_response.content  # Store raw image data
+            # Base64 encode the image data
+            map_image_base64 = base64.b64encode(map_image_data).decode('utf-8')
+            print("Map image data exists")
+        else:
+            print("Failed to fetch map image data")
+    except requests.exceptions.RequestException as e:
+        flash(f"Error fetching map: {e}", "error")
+        print(f"Error fetching map: {e}")
 
-    return render_template('item_detail.html', item=item, page_count=page_count)  # Pass the Row object to the template
+    # Render the item details template with the base64 encoded image data (or None if not found)
+    return render_template('item_detail.html', item=item, page_count=page_count, map_image_data=map_image_base64)
 
 @app.route('/delete_listing/<int:item_id>', methods=['POST'])
 def delete_listing(item_id):
