@@ -36,15 +36,36 @@
             <p><strong>State:</strong> {{ item['state'] }}</p>
             <p><strong>Zip Code:</strong> {{ item['zip_code'] }}</p>
             
-            <p><strong>Photo:</strong></p>
-            {% if item['photo'] %}
-                <p><img src="data:image/jpeg;base64,{{ item['photo'] }}" alt="Item Photo">
-                </p>
-            {% else %}
-                <p>No photo available</p>
-            {% endif %}
 
-            <p><strong>Page Views:</strong> {{ page_count or 'Unable to fetch count' }}</p>
+            <!-- <p><strong>Photo:</strong></p>
+            {% if item['photo'] %}
+            <p><img src="data:image/jpeg;base64,{{ item['photo'] }}"
+                    alt="Item Photo">
+            </p>
+            {% else %}
+            <p>No photo available</p>
+            {% endif %} -->
+
+            <p><strong>Photo:</strong></p>
+                {% if image_data_base64 %}
+                    <img src="data:image/jpeg;base64,{{ image_data_base64 }}" alt="Item Photo">
+                {% else %}
+                    <p>No photo available</p>
+                {% endif %}
+
+
+            <div class="map-section">
+                <p><strong>Location Map:</strong></p>
+                {% if map_image_data %}
+                <h2>Map Image</h2>
+                <img src="data:image/png;base64,{{ map_image_data }}" alt="Map Image">
+                {% else %}
+                <p>No map image available.</p>
+                {% endif %}
+                        </div>
+                
+            <p><strong>Page Views:</strong> {{ page_count or
+                'Unable to fetch count' }}</p>
 
             <a href="{{ url_for('browse') }}">Back to Items List</a>
         </div>

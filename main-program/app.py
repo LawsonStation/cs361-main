@@ -137,33 +137,87 @@ def search():
     return render_template("search_results.html", data=data, query=query)
 
 
+# @app.route('/create_listing', methods=['GET', 'POST'])
+# def create_listing():
+#     if request.method == 'POST':
+#         title = request.form['title']
+#         # currency = request.form['currency']
+#         price = request.form['price']
+#         description = request.form['description']
+#         city = request.form['city']
+#         state = request.form['state']
+#         zip_code = request.form['zip_code']
+
+#         photo = request.files['photo']
+#         # Read the photo data and encode.
+#         photo_data = base64.b64encode(photo.read()).decode('utf-8') if photo else None
+
+
+#         with sqlite3.connect("database.db") as items:
+#             cursor = items.cursor()
+#             cursor.execute(
+#                 '''
+#                 INSERT INTO items (title, price, description, city, state, zip_code, photo)
+#                 VALUES (?, ?, ?, ?, ?, ?, ?)
+#                 ''',
+#                 (title, price, description, city, state, zip_code, photo_data)
+#             )
+#             items.commit()
+#         return redirect(url_for('browse'))
+#     else:
+#         return render_template('create_listing.html')
 @app.route('/create_listing', methods=['GET', 'POST'])
 def create_listing():
     if request.method == 'POST':
         title = request.form['title']
-        # currency = request.form['currency']
         price = request.form['price']
         description = request.form['description']
         city = request.form['city']
         state = request.form['state']
         zip_code = request.form['zip_code']
+        photo = request.files.get('photo')  # Use get() for more safety
 
-        photo = request.files['photo']
-        # Read the photo data and encode.
-        photo_data = base64.b64encode(photo.read()).decode('utf-8') if photo else None
+        # First, insert the listing into the database to generate the item_id
+        try:
+            with sqlite3.connect("database.db") as items:
+                cursor = items.cursor()
+                cursor.execute(
+                    '''
+                    INSERT INTO items (title, price, description, city, state, zip_code)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ''',
+                    (title, price, description, city, state, zip_code)
+                )
+                items.commit()
 
+                # Get the item_id of the newly inserted item
+                item_id = cursor.lastrowid  # This returns the last inserted row's ID
+        except sqlite3.Error as e:
+            flash(f"Error saving listing to database: {e}", "error")
+            return redirect(request.url)  # Reload the form on error
 
-        with sqlite3.connect("database.db") as items:
-            cursor = items.cursor()
-            cursor.execute(
-                '''
-                INSERT INTO items (title, price, description, city, state, zip_code, photo)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''',
-                (title, price, description, city, state, zip_code, photo_data)
-            )
-            items.commit()
-        return redirect(url_for('browse'))
+        # Upload image to image server if a photo is provided
+        if photo:
+            try:
+                response = requests.post(
+                    'http://127.0.0.1:5003/upload',  # Image server URL
+                    files={'image': (photo.filename, photo.stream, photo.content_type)},  # Ensure full file with extension is passed
+                    data={'item_id': item_id}  # Send the item_id for the image upload
+                )
+
+                response.raise_for_status()  # Will raise an exception for 4xx/5xx HTTP responses
+                # Assuming server returns a JSON object with the 'url' field
+                photo_url = response.json().get('url')
+                if not photo_url:
+                    flash("Error: Image URL not returned by the server.", "error")
+                    return redirect(request.url)
+            except requests.exceptions.RequestException as e:
+                flash(f"Error uploading image: {e}", "error")
+                return redirect(request.url)  # Reload the form
+
+        flash("Listing created successfully!", "success")
+        return redirect(url_for('browse'))  # Redirect to the listings page
+
     else:
         return render_template('create_listing.html')
     
@@ -203,25 +257,66 @@ def account():
 
 #     data = cursor.fetchone()
 #     return render_template('item_detail.html', item=item)
-    
-@app.route('/item/<int:item_id>')
-def item_detail(item_id):
-        # Call the microservice to increment page view count for the item
-    microservice_url = f'http://127.0.0.1:5001/view/{item_id}'
-    
-    # POST request to increment page view
-    try:
-        response = requests.post(microservice_url)
-        response.raise_for_status()  # Will raise an HTTPError if the HTTP request failed
-    except requests.exceptions.RequestException as e:
-        flash(f"Error incrementing page view: {e}", "error")
 
-    # Fetch item witht the specified ID details from database 
+# @app.route('/item/<int:item_id>', methods=['GET', 'POST'])
+# def item_detail(item_id):
+#     # Fetch item details from database
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+#     cursor.execute('SELECT * FROM items WHERE id = ?', (item_id,))
+#     item = cursor.fetchone()  # This will now be a Row object
+#     conn.close()
+
+#     # Check if the item was found
+#     if item is None:
+#         return "Item not found", 404  # Return 404 if item not found
+
+#     # Fetch the page view count from the microservice (GET request)
+#     try:
+#         view_count_response = requests.get(f'http://127.0.0.1:5001/view/{item_id}')
+#         view_count_response.raise_for_status()
+#         page_count = view_count_response.json().get("count", 0)
+#     except requests.exceptions.RequestException as e:
+#         page_count = None  # In case of error, page count will be None
+#         flash(f"Error retrieving page view count: {e}", "error")
+
+#     # Initialize map_image_base64 with a default value
+#     map_image_base64 = None
+
+#     # Send zip code to the microservice to generate a map (raw image data) using GET with query parameters
+#     try:
+#         # Use GET request with query parameters (zipCode)
+#         map_response = requests.get(
+#             f'http://127.0.0.1:5002/map-image?zipCode={item["zip_code"]}',
+#             stream=True  # Use stream=True to handle large image data efficiently
+#         )
+#         map_response.raise_for_status()
+#         if map_response.status_code == 200:
+#             map_image_data = map_response.content  # Store raw image data
+#             # Base64 encode the image data
+#             map_image_base64 = base64.b64encode(map_image_data).decode('utf-8')
+#             print("Map image data exists")
+#         else:
+#             print("Failed to fetch map image data")
+#     except requests.exceptions.RequestException as e:
+#         flash(f"Error fetching map: {e}", "error")
+#         print(f"Error fetching map: {e}")
+
+#     # Render the item details template with the base64 encoded image data (or None if not found)
+#     return render_template('item_detail.html', item=item, page_count=page_count, map_image_data=map_image_base64)
+
+# Item Detail route
+@app.route('/item/<int:item_id>', methods=['GET', 'POST'])
+def item_detail(item_id):
+    # Fetch item details from database
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM items WHERE id = ?', (item_id,))
-    item = cursor.fetchone()  # This will now be a Row object
+    item = cursor.fetchone()
     conn.close()
+
+    if item is None:
+        return "Item not found", 404
 
     # Fetch the page view count from the microservice (GET request)
     try:
@@ -232,12 +327,46 @@ def item_detail(item_id):
         page_count = None  # In case of error, page count will be None
         flash(f"Error retrieving page view count: {e}", "error")
 
+    # Initialize map_image_base64 with a default value
+    map_image_base64 = None
 
-    # Check if the item was found
-    if item is None:
-        return "Item not found", 404  # Return 404 if item not found
+    # Send zip code to the microservice to generate a map (raw image data) using GET with query parameters
+    try:
+        # Use GET request with query parameters (zipCode)
+        map_response = requests.get(
+            f'http://127.0.0.1:5002/map-image?zipCode={item["zip_code"]}',
+            stream=True  # Use stream=True to handle large image data efficiently
+        )
+        map_response.raise_for_status()
+        if map_response.status_code == 200:
+            map_image_data = map_response.content  # Store raw image data
+            # Base64 encode the image data
+            map_image_base64 = base64.b64encode(map_image_data).decode('utf-8')
+            print("Map image data exists")
+        else:
+            print("Failed to fetch map image data")
+    except requests.exceptions.RequestException as e:
+        flash(f"Error fetching map: {e}", "error")
+        print(f"Error fetching map: {e}")
 
-    return render_template('item_detail.html', item=item, page_count=page_count)  # Pass the Row object to the template
+    # Fetch the image from the image server dynamically
+    image_data_base64 = None
+    try:
+        image_response = requests.get(f'http://127.0.0.1:5003/image/{item_id}', stream=True)
+        image_response.raise_for_status()
+        image_data = image_response.content
+        image_data_base64 = base64.b64encode(image_data).decode('utf-8')
+    except requests.exceptions.RequestException as e:
+        flash(f"Error fetching image: {e}", "error")
+
+    return render_template(
+        'item_detail.html',
+        item=item,
+        page_count=page_count,  # Adjust as needed
+        map_image_data=map_image_base64,  # Adjust as needed
+        image_data_base64=image_data_base64
+    )
+
 
 @app.route('/delete_listing/<int:item_id>', methods=['POST'])
 def delete_listing(item_id):
