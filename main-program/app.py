@@ -318,6 +318,7 @@ def item_detail(item_id):
     if item is None:
         return "Item not found", 404
 
+    # MSD (page count)
     # Fetch the page view count from the microservice (GET request)
     try:
         view_count_response = requests.get(f'http://127.0.0.1:5001/view/{item_id}')
@@ -330,6 +331,7 @@ def item_detail(item_id):
     # Initialize map_image_base64 with a default value
     map_image_base64 = None
 
+    # MSC (map image)
     # Send zip code to the microservice to generate a map (raw image data) using GET with query parameters
     try:
         # Use GET request with query parameters (zipCode)
@@ -349,6 +351,7 @@ def item_detail(item_id):
         flash(f"Error fetching map: {e}", "error")
         print(f"Error fetching map: {e}")
 
+    # MSB (image server)
     # Fetch the image from the image server dynamically
     image_data_base64 = None
     try:
@@ -366,6 +369,32 @@ def item_detail(item_id):
         map_image_data=map_image_base64,  # Adjust as needed
         image_data_base64=image_data_base64
     )
+
+# MSA
+# Item Detail Currency Conversion Route
+@app.route('/convert_currency', methods=['POST'])
+def convert_currency():
+    try:
+        # Extract JSON data from the frontend
+        data = request.get_json()
+        amount = data.get('amount')
+        target_currency = data.get('targetCurrency')
+
+        if not amount or not target_currency:
+            return {"error": "Missing required fields: amount, targetCurrency"}, 400
+
+        # Forward the request to the microservice
+        response = requests.post('http://127.0.0.1:5004/convert', json={
+            "amount": amount,
+            "targetCurrency": target_currency
+        })
+
+        # Handle response from microservice
+        response.raise_for_status()
+        return response.json()
+
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Error communicating with currency microservice: {str(e)}"}, 500
 
 
 @app.route('/delete_listing/<int:item_id>', methods=['POST'])

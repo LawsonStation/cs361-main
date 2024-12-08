@@ -53,19 +53,79 @@
                     <p>No photo available</p>
                 {% endif %}
 
+            <hr>
 
             <div class="map-section">
                 <p><strong>Location Map:</strong></p>
                 {% if map_image_data %}
-                <h2>Map Image</h2>
+                <!-- <h2>Map Image</h2> -->
                 <img src="data:image/png;base64,{{ map_image_data }}" alt="Map Image">
                 {% else %}
                 <p>No map image available.</p>
                 {% endif %}
                         </div>
-                
+            
+            <hr> 
+
             <p><strong>Page Views:</strong> {{ page_count or
                 'Unable to fetch count' }}</p>
+            
+            <hr>
+            
+            <!-- Currency Conversion -->
+                <div class="currency-converter">
+                    <h3>Currency Converter</h3>
+                    <p>Original Price (USD): $<span id="original-price">{{ item['price'] }}</span></p>
+                    <label for="currency-selector">Select Currency:</label>
+                    <select id="currency-selector">
+                        <option value="">--Select Currency--</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="JPY">JPY</option>
+                        <option value="AUD">AUD</option>
+                        <option value="CAD">CAD</option>
+                    </select>
+                    <p>Converted Price: <input type="text" id="converted-price" readonly></p>
+                    <button id="reset-btn">Reset Currency Converter</button>
+                </div>
+                
+                <script>
+                    document.getElementById('currency-selector').addEventListener('change', async function() {
+                        const selectedCurrency = this.value;
+                        const priceUSD = parseFloat(document.getElementById('original-price').textContent);
+                
+                        if (!selectedCurrency) {
+                            document.getElementById('converted-price').value = '';
+                            return;
+                        }
+                
+                        try {
+                            const response = await fetch('/convert_currency', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ amount: priceUSD, targetCurrency: selectedCurrency })
+                            });
+                
+                            const result = await response.json();
+                            if (response.ok) {
+                                document.getElementById('converted-price').value = `${result.convertedAmount} ${result.targetCurrency}`;
+                            } else {
+                                alert(result.error || 'Error converting currency');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('An error occurred while fetching the conversion.');
+                        }
+                    });
+                
+                    document.getElementById('reset-btn').addEventListener('click', function() {
+                        document.getElementById('currency-selector').value = '';
+                        document.getElementById('converted-price').value = '';
+                    });
+                </script>
+                
+            <br>
+            <hr>
 
             <a href="{{ url_for('browse') }}">Back to Items List</a>
         </div>
